@@ -11,7 +11,10 @@ def getConfigVals():
 
 	cfg.Address = 0x68
 
-	cfg.AccelOut = 0x3B # getting the accelerometer data.
+	cfg.AccelOut = 0x3B # getting the accelerometer data
+	cfg.TempOut = 0x41 # getting the temperature data
+	cfg.GyroOut = 0x43 # getting the gyroscope data
+
 	cfg.ExtSensData00 = 0x49
 	cfg.AccelConfig = 0x1C
 	cfg.AccelRangeSelect2G = 0x00
