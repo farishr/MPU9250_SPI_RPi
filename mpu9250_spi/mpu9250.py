@@ -1,7 +1,7 @@
 import spidev
 import numpy as np
 import config
-import time
+import time, csv
 
 class mpu9250:
 	
@@ -16,6 +16,8 @@ class mpu9250:
 		self.cfg.Address = address
 		self.spiBus = bus
 		self.spiBus.max_speed_hz = spi_clk
+		self.accel_bias = [0.0, 0.0, 0.0]
+		self.gyro_bias = [0.0, 0.0, 0.0]
 		
 		mpu9250.ACC_REG = [self.cfg.AccelOut, self.cfg.AccelOut+1, self.cfg.AccelOut+2, self.cfg.AccelOut+3, self.cfg.AccelOut+4, self.cfg.AccelOut+5]
 		mpu9250.GYRO_REG = [self.cfg.GyroOut, self.cfg.GyroOut+1, self.cfg.GyroOut+2, self.cfg.GyroOut+3, self.cfg.GyroOut+4, self.cfg.GyroOut+5]
@@ -29,6 +31,8 @@ class mpu9250:
 		self.writetoRegister(self.cfg.InitPinConfig, self.cfg.BypassEN)	# Bypass Enable
 		time.sleep(0.1)
 		# ~ print(mpu9250.ACC_REG)
+		self.AccelScale = 1/16384.0
+		self.GyroScale = 1/16384.0
 		
 		for x in range(6):
 			mpu9250.ACC_REG[x] |= 0x80
@@ -36,31 +40,31 @@ class mpu9250:
 			
 		mpu9250.TEMP_REG[1] |= 0x80
 		mpu9250.TEMP_REG[0] |= 0x80
-		
-		# ~ print(mpu9250.ACC_REG)
-		
-		AxOffsetVal = 0.0
-		AyOffsetVal = 0.0
-		AzOffsetVal = 0.0
-		accRangeFactor = 1
-		GxOffsetVal = 0.0
-		GyOffsetVal = 0.0
-		GzOffsetVal = 0.0
-		gyrRangeFactor = 1
+
 		
 	def getRawAccValues(self):
 		self.AccRegVals = self.spiBus.xfer([mpu9250.ACC_REG[0], mpu9250.ACC_REG[1], mpu9250.ACC_REG[2], mpu9250.ACC_REG[3], mpu9250.ACC_REG[4], mpu9250.ACC_REG[5]])
-		self.AccRawData = [np.array((self.AccRegVals[1] << 8) | self.AccRegVals[0]).astype(np.int16),
-						   np.array((self.AccRegVals[3] << 8) | self.AccRegVals[2]).astype(np.int16),
-						   np.array((self.AccRegVals[5] << 8) | self.AccRegVals[4]).astype(np.int16)]
-		return self.AccRawData
+		raw_vals = [np.array((self.AccRegVals[1] << 8) | self.AccRegVals[0]).astype(np.int16),
+					np.array((self.AccRegVals[3] << 8) | self.AccRegVals[2]).astype(np.int16),
+					np.array((self.AccRegVals[5] << 8) | self.AccRegVals[4]).astype(np.int16)]
+		return raw_vals
 						   
 	def getRawGyrValues(self):
 		self.GyrRegVals = self.spiBus.xfer([mpu9250.GYRO_REG[0], mpu9250.GYRO_REG[1], mpu9250.GYRO_REG[2], mpu9250.GYRO_REG[3], mpu9250.GYRO_REG[4], mpu9250.GYRO_REG[5]])
-		self.GyrRawData = [np.array((self.GyrRegVals[1] << 8) | self.GyrRegVals[0]).astype(np.int16),
-						   np.array((self.GyrRegVals[3] << 8) | self.GyrRegVals[2]).astype(np.int16),
-						   np.array((self.GyrRegVals[5] << 8) | self.GyrRegVals[4]).astype(np.int16)]
-		return self.GyrRawData
+		raw_vals = [np.array((self.GyrRegVals[1] << 8) | self.GyrRegVals[0]).astype(np.int16),
+					np.array((self.GyrRegVals[3] << 8) | self.GyrRegVals[2]).astype(np.int16),
+					np.array((self.GyrRegVals[5] << 8) | self.GyrRegVals[4]).astype(np.int16)]
+		return raw_vals
+	
+	def getGValues(self):
+		acc_vals = self.getRawAccValues()
+		acc_vals = [(acc_vals[i] - self.accel_bias[i]) * self.AccelScale for i in range(3)]
+		return acc_vals
+		
+	def getGyrValues(self):
+		gyr_vals = self.getRawGyrValues()
+		gyr_vals = [(gyr_vals[i] - self.gyro_bias[i]) * self.GyroScale for i in range(3)]
+		return gyr_vals
 
 	def getTemperature(self):
 		self.TempVals = self.spiBus.xfer([mpu9250.TEMP_REG[0], mpu9250.TEMP_REG[1]])
@@ -88,7 +92,7 @@ class mpu9250:
 			print ("{0} is not a proper value for accelerometer range".format(accelRange))
 			return -1
 		accelVal = float(accelRange.split('t')[1].split('G')[0])
-		self.AccelScale = self.cfg.Gravity*accelVal/32767.5
+		self.AccelScale = accelVal/32767.5
 		return 1
 		
 	def setGyroRange(self, gyroRange):
@@ -114,7 +118,7 @@ class mpu9250:
 			print ("{0} is not a proper value for gyroscope range".format(gyroscope))
 			return -1
 		gyroVal = float(gyroRange.split('t')[1].split('D')[0])
-		self.GyroScale = self.cfg.Degree2Radian*(gyroVal/32767.5)
+		self.GyroScale = gyroVal/32767.5
 		return 1
 		
 	# Digital Low Pass Filters
@@ -130,13 +134,28 @@ class mpu9250:
 		time.sleep(0.1)
 		regVal &= ~8
 		self.writetoRegister(self.cfg.AccelConfig2, regVal)
+		
+	"""
+	Select from the 8 levels of Low Pass Filters
+	1 > MPU9250_DLPF_0
+	2 > MPU9250_DLPF_1
+	3 > MPU9250_DLPF_2
+	4 > MPU9250_DLPF_3
+	5 > MPU9250_DLPF_4
+	6 > MPU9250_DLPF_5
+	7 > MPU9250_DLPF_6
+	8 > MPU9250_DLPF_7
+	
+	Check the Register map for more details. 
+	"""
 	
 	def setAccDLPF(self, accfrequency):
 		try:
 			self.writetoRegister(self.cfg.AccelConfig2, self.cfg[accfrequency])
 			self.Frequency = accfrequency
+			time.sleep(0.1)
 		except:
-			print ("{0} is not a proper value forlow pass filter".format(accfrequency))
+			print ("{0} is not a proper value for low pass filter".format(accfrequency))
 			return -1
 		return 1
 		
@@ -144,16 +163,37 @@ class mpu9250:
 		try:
 			self.writetoRegister(self.cfg.GyroConfig2, self.cfg[gyrfrequency])
 			self.Frequency = gyrfrequency
+			time.sleep(0.1)
 		except:
-			print ("{0} is not a proper value forlow pass filter".format(gyrfrequency))
+			print ("{0} is not a proper value for low pass filter".format(gyrfrequency))
 			return -1
 		return 1
 	
 	# Calibration
 		
-	def autoOffsets(self):
+	def autoOffsets(self, calib_samples):
 		self.setAccRange("AccelRangeSelect2G")
 		self.setGyroRange("GyroRangeSelect250DPS")
+		# ~ self.enableAccDLPF()
+		# ~ self.enableGyrDLPF()
+		print("Starting Calibration...")
+		
+		for i in range(calib_samples):
+			a_vals = myMPU9250.getRawAccValues()
+			g_vals = myMPU9250.getRawGyrValues()
+			self.accel_bias[0] += a_vals[0]
+			self.accel_bias[1] += a_vals[1]
+			self.accel_bias[2] += a_vals[2]
+			self.gyro_bias[0] += g_vals[0]
+			self.gyro_bias[1] += g_vals[1]
+			self.gyro_bias[2] += g_vals[2]
+			time.sleep(0.05)
+		
+		for j in range(3):
+			self.accel_bias[j] = self.accel_bias[j]/calib_samples
+			self.gyro_bias[j] = self.gyro_bias[j]/calib_samples
+		
+		self.accel_bias[2] = self.accel_bias[2] - 1 	# Adjusting for Z Axis gravity
 
 	
 	def writetoRegister(self, addr, val):
@@ -177,48 +217,3 @@ class mpu9250:
 		else:
 			raise Exception("Please provide the object created by spidev")
 			
-
-# ######################Testing Section######################
-
-spi1 = spidev.SpiDev()
-spi1.open(0 , 0)
-
-address = 0x68
-myMPU9250 = mpu9250(address, spi1,1000000)
-
-myMPU9250.begin()
-myMPU9250.enableGyrDLPF()
-
-i=0
-j=0
-
-while i<50:
-	gyro_sensor = myMPU9250.getRawGyrValues()
-	print("Gx: {0} ; Gy : {1} ; Gz : {2}".format(gyro_sensor[0], gyro_sensor[1], gyro_sensor[2]))
-	# ~ print("Gx: {0} ; Gy : {1} ; Gz : {2}".format(myMPU9250.GyrRawData[0], myMPU9250.GyrRawData[1], myMPU9250.GyrRawData[2]))
-	
-	# ~ acc_sensor = myMPU9250.getRawAccValues()
-	# ~ print("Ax: {0} ; Ay : {1} ; az : {2}".format(acc_sensor[0], acc_sensor[1], acc_sensor[2]))
-	
-	# ~ temp = myMPU9250.getTemperature()
-	# ~ print("Temp: {0}".format(temp))
-	i+=1
-	time.sleep(0.2)
-
-myMPU9250.enableAccDLPF()
-myMPU9250.setGyrDLPF("AccelLowPassFilter184")
-print("DLPF SET")
-
-while j<50:
-	gyro_sensor = myMPU9250.getRawGyrValues()
-	print("Gx: {0} ; Gy : {1} ; Gz : {2}".format(gyro_sensor[0], gyro_sensor[1], gyro_sensor[2]))
-	# ~ print("Gx: {0} ; Gy : {1} ; Gz : {2}".format(myMPU9250.GyrRawData[0], myMPU9250.GyrRawData[1], myMPU9250.GyrRawData[2]))
-	
-	# ~ acc_sensor = myMPU9250.getRawAccValues()
-	# ~ print("Ax: {0} ; Ay : {1} ; az : {2}".format(acc_sensor[0], acc_sensor[1], acc_sensor[2]))
-	
-	# ~ temp = myMPU9250.getTemperature()
-	# ~ print("Temp: {0}".format(temp))
-	j+=1
-	time.sleep(0.2)
-
