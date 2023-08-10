@@ -171,7 +171,7 @@ class mpu9250:
 	
 	# Calibration
 		
-	def autoOffsets(self, calib_samples):
+	def calibrate(self, calib_samples):
 		self.setAccRange("AccelRangeSelect2G")
 		self.setGyroRange("GyroRangeSelect250DPS")
 		# ~ self.enableAccDLPF()
@@ -195,6 +195,9 @@ class mpu9250:
 		
 		self.accel_bias[2] = self.accel_bias[2] - 1 	# Adjusting for Z Axis gravity
 
+	def clear_offsets(self):
+		self.accel_bias = [0.0 for x in range(3)]
+		self.gyro_bias = [0.0 for x in range(3)]
 	
 	def writetoRegister(self, addr, val):
 		self.spiBus.xfer([addr,val])		# [<Address to be Written to>, <Value to be written to the Address>]
@@ -217,3 +220,31 @@ class mpu9250:
 		else:
 			raise Exception("Please provide the object created by spidev")
 			
+
+# ######################Testing Section######################
+
+AxRaw, AyRaw, AzRaw, GxRaw, GyRaw, GzRaw = [],[],[],[],[],[]
+
+spi1 = spidev.SpiDev()
+spi1.open(0 , 0)
+
+address = 0x68
+myMPU9250 = mpu9250(address, spi1,2000000)
+
+myMPU9250.begin()
+
+myMPU9250.calibrate(100)
+
+for y in range(50):
+	accel = myMPU9250.getGValues()
+	print(accel)
+	time.sleep(0.2)
+
+print("Setting Offsets")
+myMPU9250.clear_offsets()
+time.sleep(10)
+
+for y in range(50):
+	accel = myMPU9250.getGValues()
+	print(accel)
+	time.sleep(0.2)
