@@ -27,3 +27,6 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
 | Pin 21 | AD0 |
 | Pin 24 | NCS |
 | Pin 6 | FSYNC |
+
+## Software Setup
+Ensure that SPI has been enabled in your Raspberry Pi. Follow this [link](https://www.raspberrypi-spy.co.uk/2014/08/enabling-the-spi-interface-on-the-raspberry-pi/) to setup SPI in your RPi
