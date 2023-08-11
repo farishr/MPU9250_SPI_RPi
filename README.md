@@ -12,6 +12,18 @@ This python package interfaces the MPU9250 (9-Axis (Gyro + Accelerometer + Compa
 - [Contributing](#contributing)
 
 ## Features
-1. Extraction of raw data directly from registers, sensors values in standard units and calibrated sensor values.
-2. Set multiple data ranges on the sensors for each application it is used.
-3. Apply various inbuilt LPFs on the sensors for filtering out noise and getting cleaner data. 
+- Extraction of raw data directly from registers, sensors values in standard units and calibrated sensor values.
+- Set multiple data ranges on the sensors for each application it is used.
+- Apply various inbuilt LPFs on the sensors for filtering out noise and getting cleaner data.
+
+## Wiring
+MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be acheived by using the following wiring scheme:
+| RPi | MPU9250 |
+|--------|-------|
+| Pin 1 | Vcc |
+| Pin 6 | GND |
+| Pin 23 | SCL |
+| Pin 19 | SDA |
+| Pin 21 | AD0 |
+| Pin 24 | NCS |
+| Pin 6 | FSYNC |
