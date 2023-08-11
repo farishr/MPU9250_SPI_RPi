@@ -29,4 +29,10 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
 | Pin 6 | FSYNC |
 
 ## Software Setup
-Ensure that SPI has been enabled in your Raspberry Pi. Follow this [link](https://www.raspberrypi-spy.co.uk/2014/08/enabling-the-spi-interface-on-the-raspberry-pi/) to setup SPI in your RPi
+1. Ensure that SPI has been enabled in your Raspberry Pi. Follow this [link](https://www.raspberrypi-spy.co.uk/2014/08/enabling-the-spi-interface-on-the-raspberry-pi/) to setup SPI in your RPi.
+2. Install **spidev**
+   ```bash
+   sudo pip install spidev
+   ```
+## Function List
+
