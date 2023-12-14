@@ -94,3 +94,13 @@ gyroRange : str
 	2000DPS: GyroRangeSelect2000DPS
 """
 ```
+### Enable Digital Low Pass Filter
+```bash
+# Accelerometer DLPF
+enableAccDLPF()
+setAccDLPF(level)
+
+# Gyroscope DLPF
+enableGyrDLPF()	
+setGyrDLPF(level)
+```
