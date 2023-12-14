@@ -94,7 +94,8 @@ gyroRange : str
 	2000DPS: GyroRangeSelect2000DPS
 """
 ```
-### Enable Digital Low Pass Filter
+### Set Digital Low Pass Filter
+Set digital lowpass filters from 8 levels on the accelerometer and gyroscope. Check the FFT outputs for each of the DLPF levels.
 ```bash
 # Accelerometer DLPF
 enableAccDLPF()
@@ -118,4 +119,9 @@ Select from the 8 levels of Low Pass Filters
 	
 Check the Register map for more details. 
 """
+```
+### Calibration
+Calibrates accelerometer and gyroscope. _sample_count_ is used to set the number of calibration samples used.
+```bash
+calibrate(sample_count)
 ```
