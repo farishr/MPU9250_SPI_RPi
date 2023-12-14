@@ -39,5 +39,8 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
    ```bash
    sudo pip install numpy
    ```
-## Initialization
-1. 
+## Functions
+### Get raw sensor value
+   ```bash
+   getRawAccValues()
+   ```
