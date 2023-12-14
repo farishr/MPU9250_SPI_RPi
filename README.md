@@ -60,3 +60,24 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
   ```bash
   getGyrValues()
   ```
+  ### Get Temperature
+  Gets the temperature readings from the sensor in degree celsius.
+  ```bash
+getTemperature()
+```
+### Set accelerometer range
+Sets the following ranges in the accelerometer.
+```bash
+"""Sets the range of accelerometer
+
+		Parameters
+		----------
+		accelRange : str
+			The supported ranges are as following ->
+			2g  -> AccelRangeSelect2G
+			4g  -> AccelRangeSelect4G
+			8g  -> AccelRangeSelect8G
+			16g -> AccelRangeSelect16G
+
+"""
+```
