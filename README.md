@@ -73,7 +73,7 @@ setAccRange(accelRange)
 ```bash
 """
 accelRange : str
-	The supported ranges are as following ->
+	The supported ranges are as following:
 	2g: AccelRangeSelect2G
 	4g: AccelRangeSelect4G
 	8g: AccelRangeSelect8G
