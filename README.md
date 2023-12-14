@@ -35,5 +35,9 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
    ```bash
    sudo pip install spidev
    ```
-## Function List
-
+3. Install **spidev**
+   ```bash
+   sudo pip install spidev
+   ```
+## Initialization
+1. 
