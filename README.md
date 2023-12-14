@@ -104,3 +104,18 @@ setAccDLPF(level)
 enableGyrDLPF()	
 setGyrDLPF(level)
 ```
+```bash
+"""
+Select from the 8 levels of Low Pass Filters
+	1 > MPU9250_DLPF_0
+	2 > MPU9250_DLPF_1
+	3 > MPU9250_DLPF_2
+	4 > MPU9250_DLPF_3
+	5 > MPU9250_DLPF_4
+	6 > MPU9250_DLPF_5
+	7 > MPU9250_DLPF_6
+	8 > MPU9250_DLPF_7
+	
+Check the Register map for more details. 
+"""
+```
