@@ -80,3 +80,18 @@ accelRange : str
 	16g: AccelRangeSelect16G
 """
 ```
+### Set gyroscope range
+```bash
+setGyroRange(accelRange)
+```
+```bash
+"""Sets the range of gyroscope
+gyroRange : str
+	The supported ranges are as following ->
+	250DPS: GyroRangeSelect250DPS
+	500DPS: GyroRangeSelect500DPS
+	1000DPS: GyroRangeSelect1000DPS
+	2000DPS: GyroRangeSelect2000DPS
+DPS means degrees per freedom
+"""
+```
