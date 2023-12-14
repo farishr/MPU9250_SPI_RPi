@@ -37,7 +37,7 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
    ```
 3. Install **spidev**
    ```bash
-   sudo pip install spidev
+   sudo pip install numpy
    ```
 ## Initialization
 1. 
