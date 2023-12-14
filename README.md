@@ -125,3 +125,8 @@ Calibrates accelerometer and gyroscope. _sample_count_ is used to set the number
 ```bash
 calibrate(sample_count)
 ```
+### Clear calibration offsets
+Clears the offset values of the calibration.
+```bash
+clear_offsets()
+```
