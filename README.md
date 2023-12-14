@@ -68,16 +68,15 @@ getTemperature()
 ### Set accelerometer range
 Sets the following ranges in the accelerometer.
 ```bash
-"""Sets the range of accelerometer
-
-		Parameters
-		----------
-		accelRange : str
-			The supported ranges are as following ->
-			2g  -> AccelRangeSelect2G
-			4g  -> AccelRangeSelect4G
-			8g  -> AccelRangeSelect8G
-			16g -> AccelRangeSelect16G
-
+setAccRange(accelRange)
+```
+```bash
+"""
+accelRange : str
+	The supported ranges are as following ->
+	2g: AccelRangeSelect2G
+	4g: AccelRangeSelect4G
+	8g: AccelRangeSelect8G
+	16g: AccelRangeSelect16G
 """
 ```
