@@ -40,7 +40,13 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
    sudo pip install numpy
    ```
 ## Functions
-### Get raw sensor value
+  ### Get raw accelerometer value
+  Gets the raw accelerometer data in the unsigned int16 format.
    ```bash
    getRawAccValues()
+   ```
+  ### Get raw gyroscope value
+  Gets the raw gyroscope data in the unsigned int16 format.
+  ```bash
+   getRawGyrValues()
    ```
