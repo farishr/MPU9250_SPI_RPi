@@ -3,9 +3,9 @@ This python package interfaces the MPU9250 (9-Axis (Gyro + Accelerometer + Compa
 
 ## In this README:
 
-- [Features](##features)
+- [Features](#features)
 - [Wiring](#wiring)
-- [Software Setup](#projects-using-this-template)
+- [Software Setup](#software-setup)
 - [Functions](#functions)
 - [Contributing](#contributing)
 
