@@ -53,5 +53,10 @@ MPU9250 is interfaced to the Raspberry Pi using the SPI interface. This can be a
   ### Get G values
   Gets the accelerometer values in 'g'. Run the calibration function before this function to get the adjusted g values.
   ```bash
-  getGValues
+  getGValues()
+  ```
+  ### Get gyroscope values
+  Gets the gyroscope values in angular velocity. Run the calibration function before this function to get the adjusted gyroscope values.
+  ```bash
+  getGyrValues()
   ```
